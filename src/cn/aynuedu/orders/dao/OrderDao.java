@@ -42,5 +42,31 @@ public class OrderDao extends BaseDao {
         return list;
     }
 
+    /**
+     * 根据订单id删除无用数据
+     * @param orderId 订单表中的Id
+     */
+    public void deleteOrderId(int orderId) {
+        String sql = "delete from myshop.order where id = "+orderId+"";
+        try {
+            super.update(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 根据订单id去修改对应的支付状态
+     * @param orderId 订单表中的id属性唯一表示当前数据
+     *
+     */
+    public void modifyStatus(int orderId) {
+        String sql = "update myshop.order set status="+1+" where id="+orderId+"";
+        try {
+            super.update(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

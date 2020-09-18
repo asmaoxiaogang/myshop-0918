@@ -1,5 +1,7 @@
 package cn.aynuedu.orders.servlet;
 
+import cn.aynuedu.address.dao.AddressDao;
+import cn.aynuedu.address.pojo.Address;
 import cn.aynuedu.orders.dao.OrderDao;
 import cn.aynuedu.orders.pojo.Order;
 import com.alipay.api.AlipayApiException;
@@ -34,6 +36,10 @@ import static java.lang.System.out;
 @WebServlet("/order.action")
 public class OrderServlet extends BaseServlet {
     private OrderDao orderDao = new OrderDao();
+    //2020.09.18 10:23
+    private AddressDao addressDao = new AddressDao();
+    //2020.09.18 10:23
+
 
     public void addOrder(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         out.println("come on addOrder");
@@ -92,10 +98,23 @@ public class OrderServlet extends BaseServlet {
         out.println("come on listOrder");
         List<Order> list = orderDao.findAllOrder(Integer.parseInt(String.valueOf(request.getSession(false).getAttribute("userId"))));
         out.println("list:" + list.isEmpty());
-        request.setAttribute("list", list);
+
+        //2020.09.18 10:23
+        // request.setAttribute("orderList", list);//前期给个空值用来做地址展示判断，默认为空，去让用户数据，
+        // 不为空就去展示数据库中当前用户对应的地址信息即查询address库
+        showOrderListAddress(request);
+        //2020.09.18 10:23
+
+        request.setAttribute("orderList", list);
         request.getRequestDispatcher("jsp/order/showOrder.jsp").forward(request, response);
     }
 
+    /**
+     * 支付宝支付页面的现实和应用
+     * @param request
+     * @param response
+     * @throws IOException
+     */
     public void pay(HttpServletRequest request, HttpServletResponse response) throws IOException {
         //获得初始化的AlipayClient
         AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.gatewayUrl, AlipayConfig.app_id, AlipayConfig.merchant_private_key, "json", AlipayConfig.charset, AlipayConfig.alipay_public_key, AlipayConfig.sign_type);
@@ -142,5 +161,39 @@ public class OrderServlet extends BaseServlet {
         response.getWriter().println(result);
     }
 
+    public void paySuccess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+       //买家id：dewwyr4230@sandbox.com
+        out.println("come on paySuccess");
+        String parameter = request.getParameter("out_trade_no");
+        orderDao.modifyStatus(Integer.parseInt(parameter));
+        out.println("订单id" + parameter);
+        request.getRequestDispatcher("/jsp/payPage/paySuccess.jsp").forward(request, response);
+    }
 
+    public void deleteOrder(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        out.println("come deleteOrder");
+        String orderId = request.getParameter("orderId");
+        orderDao.deleteOrderId(Integer.parseInt(orderId));
+
+        //2020.09.18 10:23
+        // request.setAttribute("orderList", list);//前期给个空值用来做地址展示判断，默认为空，去让用户数据，
+        // 不为空就去展示数据库中当前用户对应的地址信息即查询address库
+        showOrderListAddress(request);
+        //2020.09.18 10:23
+
+        List<Order> list = orderDao.findAllOrder(Integer.parseInt(String.valueOf(request.getSession(false).getAttribute("userId"))));
+        out.println("come on deleteOrder findAllOrder");
+        request.setAttribute("orderList", list);
+        request.getRequestDispatcher("jsp/order/showOrder.jsp").forward(request, response);
+    }
+
+    private void showOrderListAddress(HttpServletRequest request) {
+        System.out.println("come on list cart listAddress");
+        int uid = Integer.parseInt(String.valueOf(request.getSession(false).getAttribute("userId")));
+        System.out.println("listOrder listAddress uid" + uid);
+        List<Address> addressList = addressDao.listAddress(uid);
+        System.out.println("addressList running...");
+        System.out.println(addressList.toString());
+        request.setAttribute("addressList", addressList);
+    }
 }

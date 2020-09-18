@@ -48,7 +48,7 @@
 </head>
 <body>
 <h1><span style="color: darkred">${sessionScope.username}</span>:&nbsp;请填写您的收货信息</h1>
-    <form action="address.action?method=addAddress" method="post">
+    <form action="address.action?method=addAddress" method="get">
         <table id="inputAddress-table" align="center">
             <table align="center" border="1px solid black" width="600px" >
                 <tr>

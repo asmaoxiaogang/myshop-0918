@@ -1,5 +1,6 @@
 package cn.aynuedu.cart.servlet;
 
+import cn.aynuedu.address.dao.AddressDao;
 import cn.aynuedu.cart.dao.CartDao;
 import cn.aynuedu.pojo.Shoppingcart;
 import util.BaseServlet;
@@ -20,6 +21,9 @@ import java.util.List;
 @WebServlet("/cart.action")
 public class CartServlet extends BaseServlet {
     private CartDao cartDao = new CartDao();
+    //2020.09.18 10:23
+    private AddressDao addressDao = new AddressDao();
+    //2020.09.18 10:23
 
     /**
      * 添加购物车模块
@@ -134,6 +138,17 @@ public class CartServlet extends BaseServlet {
 //        List<Shoppingcart> idCart = cartDao.findIdCart(Integer.parseInt(request.getParameter("id")));
         List<Shoppingcart> idCart = cartDao.findIdCart(uId);
 
+        //2020.09.18 10:23
+        // request.setAttribute("orderList", list);//前期给个空值用来做地址展示判断，默认为空，去让用户数据，
+        // 不为空就去展示数据库中当前用户对应的地址信息即查询address库
+//        System.out.println("come on list cart listAddress");
+//        int uid =  Integer.parseInt(String.valueOf(request.getSession(false).getAttribute("userId")));
+//        System.out.println("listOrder listAddress uid" + uid);
+//        List<Address> addressList = addressDao.listAddress(uid);
+//        System.out.println("addressList running...");
+//        System.out.println(addressList.toString());
+//        request.setAttribute("addressList", addressList);
+        //2020.09.18 10:23
 
         System.out.println(idCart.isEmpty());
         request.setAttribute("list", idCart);
@@ -148,6 +163,7 @@ public class CartServlet extends BaseServlet {
 
         System.out.println("id " + request.getParameter("id"));
         cartDao.clearCart(Integer.parseInt(request.getParameter("id")));
+
 
         request.getRequestDispatcher("jsp/cart/showCart.jsp").forward(request, response);
 
@@ -190,6 +206,8 @@ public class CartServlet extends BaseServlet {
 
         List<Shoppingcart> idCart = cartDao.findIdCart(Integer.parseInt(request.getParameter("userId")));
         request.setAttribute("list", idCart);
+
+//        request.setAttribute("addressList",null);
         request.getRequestDispatcher("jsp/cart/showCart.jsp").forward(request, response);
     }
 
